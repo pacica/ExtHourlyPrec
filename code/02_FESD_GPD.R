@@ -178,6 +178,7 @@ MLE_par_GPD_fe <- c(MLE_par_opt_fe[1:(nunits*2)],exp(MLE_par_opt_fe[nunits*2+1])
 llk_GPD_fe <- -GPD.GAS.nllk.fe(MLE_estimates$par, panel, tails_type, units)
 
 print("quantile estimation")
+qlevel <- 0.99
 for (i in 1:length(units)){
   # parameter dynamics and quantiles
   dyn_par_GPD_fe <- append(dyn_par_GPD_fe,list(par.dyn.GPD(MLE_par_GPD_fe[c(i,i+length(units),(length(units)*2+1):length(MLE_par_GPD_fe))], (panel$HourlyPrecipitation-panel$tvth_mv)[panel$ID==units[i]], tails_type)))

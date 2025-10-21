@@ -48,6 +48,7 @@ if (initvalue=="given"){
                -1.0498221245, -3.2188758249,  0.6190392084,  4.4987990588) # common parameters (A^sigma, A^xi, B^sigma, B^xi)
   
   # load functions
+  source("functions/GPD.stat.fit.R")
   source("functions/param.gradrep.R")
   source("functions/GPD.GAS.nllk.fe_rep.R")
   source("functions/VCOV.R")
@@ -58,6 +59,9 @@ if (initvalue=="given"){
   ############################################################################################################################
   ################ this computes the starting values for the estimation of the FESD-GPD model
   ############################################################################################################################
+  # load function for static GPD estimation
+  source("functions/GPD.stat.fit.R")
+  
   # previous data----
   load("output/01_WIC_GPD_static.RData")
   set.seed(1)

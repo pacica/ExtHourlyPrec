@@ -5,7 +5,7 @@ library(parallel)
 
 setwd("~/Downloads/ExtHourlyPrec-main")
 
-initvalue <- "given"
+initvalue <- "given" # if "given", it skips the procedure for the computation of starting values
 
 if (initvalue=="given"){
   ####################################################################################################################################
@@ -37,6 +37,7 @@ if (initvalue=="given"){
   dt_LOU <- tvth[[q]]$dt
   dt_LOU$ID <- "LOU"
   
+  # create full panel dataset
   panel <- rbind(dt_WIC,dt_KAN,dt_STL,dt_EVA,dt_LOU)
   panel$exc <- panel$HourlyPrecipitation-panel$tvth_mv
   units <- unique(panel$ID)
@@ -46,7 +47,7 @@ if (initvalue=="given"){
                0.0029396486,  0.0008774869, -0.0031856875, -0.0049889719, -0.0050614738, # intercept of xi for each location
                -1.0498221245, -3.2188758249,  0.6190392084,  4.4987990588) # common parameters (A^sigma, A^xi, B^sigma, B^xi)
   
-  # functions
+  # load functions
   source("functions/param.gradrep.R")
   source("functions/GPD.GAS.nllk.fe_rep.R")
   source("functions/VCOV.R")
@@ -103,6 +104,7 @@ if (initvalue=="given"){
   units <- unique(panel$ID)
   nunits <- length(units)
   
+  # set grid for static common parameters
   guess_A_sigma <- c(0.1,0.2,0.3,0.35,0.4,0.45,0.5)
   guess_A_xi <- c(0.01,0.02,0.03,0.04,0.045,0.05,0.06)
   guess_B_sigma <- c(0.6,0.65,0.7,0.75,0.8,0.85,0.9)
@@ -110,11 +112,7 @@ if (initvalue=="given"){
   AB <- as.data.frame(expand.grid(guess_A_sigma,guess_A_xi,guess_B_sigma,guess_B_xi))
   names(AB) <- c("A_sigma","A_xi","B_sigma","B_xi")
   
-  guess_omega_WIC <- guess_omega_KAN <- guess_omega_STL <- guess_omega_EVA <- guess_omega_LOU <- matrix(NA,2,nrow(AB))
-  initpar <- initpar_1 <- matrix(NA,nrow(AB),length(units)*2+4)
-  nloglik <- numeric()
-  
-  # functions
+  # load functions
   source("functions/param.gradrep.R")
   source("functions/GPD.GAS.nllk.fe_rep.R")
   source("functions/VCOV.R")
@@ -122,17 +120,22 @@ if (initvalue=="given"){
   source("functions/GPD.SD.VaR_tvth.R")
   source("functions/GPD.par.dyn.R")
   
+  # initialization
+  guess_omega_WIC <- guess_omega_KAN <- guess_omega_STL <- guess_omega_EVA <- guess_omega_LOU <- matrix(NA,2,nrow(AB))
+  initpar <- initpar_1 <- matrix(NA,nrow(AB),length(units)*2+4)
+  nloglik <- numeric()
+  
   for (l in 1:nrow(AB)){
     guess_omega_WIC[1,l] <- log(long_term_mean_WIC[1])*(1-AB[l,3])
-    guess_omega_WIC[2,l]<- log(long_term_mean_WIC[2]/(1-long_term_mean_WIC[2]))*(1-AB[l,4])
+    guess_omega_WIC[2,l] <- log(long_term_mean_WIC[2]/(1-long_term_mean_WIC[2]))*(1-AB[l,4])
     guess_omega_KAN[1,l] <- log(long_term_mean_KAN[1])*(1-AB[l,3])
-    guess_omega_KAN[2,l]<-log(long_term_mean_KAN[2]/(1-long_term_mean_KAN[2]))*(1-AB[l,4])
+    guess_omega_KAN[2,l] <- log(long_term_mean_KAN[2]/(1-long_term_mean_KAN[2]))*(1-AB[l,4])
     guess_omega_STL[1,l] <- log(long_term_mean_STL[1])*(1-AB[l,3])
-    guess_omega_STL[2,l]<-log(long_term_mean_STL[2]/(1-long_term_mean_STL[2]))*(1-AB[l,4])
+    guess_omega_STL[2,l] <- log(long_term_mean_STL[2]/(1-long_term_mean_STL[2]))*(1-AB[l,4])
     guess_omega_EVA[1,l] <- log(long_term_mean_EVA[1])*(1-AB[l,3])
-    guess_omega_EVA[2,l]<-log(long_term_mean_EVA[2]/(1-long_term_mean_EVA[2]))*(1-AB[l,4])
+    guess_omega_EVA[2,l] <- log(long_term_mean_EVA[2]/(1-long_term_mean_EVA[2]))*(1-AB[l,4])
     guess_omega_LOU[1,l] <- log(long_term_mean_LOU[1])*(1-AB[l,3])
-    guess_omega_LOU[2,l]<-log(long_term_mean_LOU[2]/(1-long_term_mean_LOU[2]))*(1-AB[l,4])
+    guess_omega_LOU[2,l] <- log(long_term_mean_LOU[2]/(1-long_term_mean_LOU[2]))*(1-AB[l,4])
     
     
     initpar[l,] <- c(guess_omega_WIC[1,l],guess_omega_KAN[1,l],guess_omega_STL[1,l],guess_omega_EVA[1,l],guess_omega_LOU[1,l],

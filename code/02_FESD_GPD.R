@@ -5,7 +5,7 @@ library(parallel)
 
 setwd("~/Downloads/ExtHourlyPrec-main")
 
-initvalue <- "given" # if "given", it skips the procedure for the computation of starting values
+initvalue <- "nogiven" # if initvalue=="given", it skips the procedure for the computation of starting values
 
 if (initvalue=="given"){
   ####################################################################################################################################
